@@ -1,0 +1,7 @@
+Binaries/*
+!Binaries/ThirdParty/
+Binaries/ThirdParty/*
+!Binaries/ThirdParty/AnselSDK32.dll
+!Binaries/ThirdParty/AnselSDK64.dll
+
+Intermediate/*
