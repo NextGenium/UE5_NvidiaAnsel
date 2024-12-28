@@ -1,7 +1,7 @@
 {
 	"FileVersion": 3,
 	"Version": 510,
-	"VersionName": "5.4.0.Original",
+	"VersionName": "5.5.0.Original",
 	"FriendlyName": "Nvidia Ansel Photography Plugin",
 	"Description": "Plugin to support Ansel Photography",
 	"Category": "Photography",
@@ -10,7 +10,7 @@
 	"DocsURL": "",
 	"MarketplaceURL": "",
 	"SupportURL": "",
-	"EngineVersion": "5.4.0",
+	"EngineVersion": "5.5.0",
 	"CanContainContent": false,
 	"Installed": true,
 	"Modules": [
