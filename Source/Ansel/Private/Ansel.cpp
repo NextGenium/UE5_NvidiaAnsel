@@ -645,8 +645,13 @@ bool FNVAnselCameraPhotographyPrivate::UpdateCamera(FMinimalViewInfo& InOutPOV, 
 		APlayerController* PCOwner = PCMgr->GetOwningPlayerController();
 		if(CameraComponent==nullptr)
 		{
-			APawn* Pawn= PCMgr->GetWorld()->GetFirstPlayerController()->GetPawn();
-			CameraComponent = Cast<UCameraComponent>(Pawn->AddComponentByClass(UCameraComponent::StaticClass(),false,FTransform::Identity,false));
+			UWorld* World = PCMgr ? PCMgr->GetWorld() : nullptr;
+			APlayerController* PC = World ? World->GetFirstPlayerController() : nullptr;
+			APawn* Pawn = PC ? PC->GetPawn() : nullptr;
+			if (IsValid(Pawn))
+			{
+				CameraComponent = Cast<UCameraComponent>(Pawn->AddComponentByClass(UCameraComponent::StaticClass(),false,FTransform::Identity,false));
+			}
 		}
 		++NumFramesSinceSessionStart;
 
