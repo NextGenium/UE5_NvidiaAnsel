@@ -1,53 +1,93 @@
-# UnrealEngine5_NvidiaAnsel
-一个基于Unreal Engine4.27 版本Nvidia Ansel移植而来的版本，提供两个版本，普通版本和自动抓取版本.
+# Nvidia Ansel
 
-修正：安装存在的部分的瑕疵，规范了build.cs文件
-## update
-更新5.2版本，添加更多设置选项：
-![image](https://github.com/MonsterGuo/UE5_NvidiaAnsel/assets/39860733/303d32df-57e9-492a-a3e2-a93c438cc1b6)
+> **📖 Upstream documentation — MonsterGuo / UE5_NvidiaAnsel**
+>
+> Базовая архитектура (Nvidia Ansel photo-mode для UE5, freeze game / camera control / filters / screenshot capture, в том числе 360° и stereo 360° рендер) — в upstream repo: **https://github.com/MonsterGuo/UE5_NvidiaAnsel** (README на китайском, с пошаговой инструкцией по настройке GeForce Experience и viewport).
+>
+> Этот README описывает плагин на high-level + **NextGenium-доработки** относительно upstream. Для оригинальной документации Epic Games `Ansel` plugin см. UE Engine source — `Engine/Plugins/Runtime/Nvidia/Ansel`.
 
-# 安装：将插件安装到任意，引擎能识别到插件的位置即可
+## Overview
 
-# Ansel_Capture
-一个基于 Unreal Engine 4.27 修改的Nvidia_Ansel plugins 可以用于生成360 或者立体360 影片的工具 
-这是基于Unreal Engine 4.27 的Ansel插件修改而来的版本。
-在开始你的工作之前你需要做好一下准备：
-#### 1.确认您的显卡已经安装好显卡驱动：
-目前已经测试了：456.71~551.79版本的Nvidia驱动。
-#### 2.假如你需要更改单帧的保存位置：请安装Nvidia的GeForceExperience组件。
-**没有修改：将默认保存在系统指定的”视频文件夹下方“
+Photo-mode плагин на основе Nvidia Ansel SDK для UE5. Позволяет в runtime заморозить игру, управлять камерой, накладывать фильтры и делать высококачественные screenshots (включая 360° и stereo 360°). Это портация upstream `MonsterGuo/UE5_NvidiaAnsel` (UE4.27 → UE5), который сам является доработкой оригинального Epic Games `Ansel` плагина.
 
-（1）点击“设置”
+В Next Framework входит как `3rdParty` плагин (Category: `Photography`). Полезен для маркетинга и PR-материалов проектов — генерация screenshots в высоком разрешении без отдельного toolset'а.
 
-![Pasted image 20220324120858](https://user-images.githubusercontent.com/39860733/159846088-18804c78-c19a-47ca-8edc-ea44e3d7a3af.png)
-（2）关闭“游戏内覆盖”，这一步是为了确保“Ansel”能正常启动，这里为啥我也不大清楚。反正必须关掉，虚幻内部的Ansel才能启动。
+## When to use
 
-![Pasted image 20220324121037](https://user-images.githubusercontent.com/39860733/159846137-8b6e1ee7-57e3-4cb8-b1bb-c78f52e559b2.png)
-（3）点击“游戏内覆”盖设置
+- Нужен встроенный photo-mode без написания собственной capture-системы.
+- Команде маркетинга / арт-направления нужны 360° и stereo 360° screenshots проекта.
+- Нужно дать игрокам встроенную возможность делать качественные screenshots с фильтрами.
+- Проект на UE5.6+ и нужна портированная версия Epic'овского `Ansel` плагина (оригинал был UE4-only).
 
-![Pasted image 20220324120645](https://user-images.githubusercontent.com/39860733/159846194-877e800a-cc0b-48e6-9712-8b22d08c5ee8.png)
-（4）点击“设置”选项
+## Boundary
 
-![Pasted image 20220324121245](https://user-images.githubusercontent.com/39860733/159846343-153054d9-3cf0-4304-b42d-8202dafcbe8e.png)
-（5）设置保存路径
+- **Видео-захват / replay** — Ansel делает только static screenshots; для видео нужен Movie Render Queue / OBS.
+- **Post-processing pipeline** — Ansel работает поверх существующего PP, не заменяет его.
+- **Запись gameplay session** — не входит в scope, только моментальные кадры.
+- **Поддержка не-Nvidia GPU** — Ansel SDK работает только с Nvidia GeForce / RTX картами.
 
-![Pasted image 20220324122738](https://user-images.githubusercontent.com/39860733/159846366-b01d8273-55bc-4cd4-9ff7-26e082e122e4.png)
-![Pasted image 20220324122852](https://user-images.githubusercontent.com/39860733/159846373-489b35b0-f155-4791-80d8-2cbacb7be82b.png)
-#### 3.下方就是在虚幻4中普通使用的一个情景
-1.先关闭场景的”自动曝光“，这里的值可以根据自己的预设值设定。
+## NextGenium-доработки (поверх upstream)
 
-![Pasted image 20220324125255](https://user-images.githubusercontent.com/39860733/159846410-f6ff752d-283a-41c4-9fdd-45e8394a5bd6.png)  
+NextGenium-доработок поверх upstream на момент написания не зафиксировано. Repo — clean fork от `MonsterGuo/UE5_NvidiaAnsel` (branch `UE5.6`).
 
-2.确保窗口模式下为16:9的分辨率模式。  
-例如：1920*1080、2560*1440、3840*2160  
-![image](https://github.com/user-attachments/assets/3af3452e-ed2a-4a50-b83d-7fa6d5663d7b)
+## Modules
 
-![image](https://github.com/user-attachments/assets/a505730b-d288-44ed-a2aa-263d448ea2a9)  
+| Модуль | Тип | LoadingPhase | Назначение |
+|---|---|---|---|
+| `Ansel` | Runtime | `PostConfigInit` | Интеграция Nvidia Ansel SDK в UE renderer (camera control, screenshot capture, filter overlay). |
 
+**Plugin dependencies:** нет (только Nvidia Ansel SDK binaries).
+**Platform:** `Win64` (по `.uplugin`).
 
+## Installation
 
+Через Next Framework Loader: **Nvidia Ansel**.
 
-#### 增强配置器，可提供更高分辨率输出  
-![QQ截图20231016195724](https://github.com/MonsterGuo/UE5_NvidiaAnsel/assets/39860733/ba1eb235-7de5-44ab-a0a8-7ecf0be4bd28)
+Или вручную:
 
+```bash
+cd <YourProject>/Plugins
+git clone https://github.com/NextGenium/UE5_NvidiaAnsel.git
+```
 
+В корне репо лежит `NvCameraConfiguration.exe` — конфигуратор для расширенных настроек Ansel (resolution presets и т.п.).
+
+## How to use (high-level)
+
+1. Скопировать плагин в `<YourProject>/Plugins/Ansel`.
+2. В проекте включить плагин **Nvidia Ansel Photography Plugin** в Plugin Settings.
+3. На целевой машине должны быть установлены актуальные Nvidia GeForce drivers (тестируются 456.71 — 551.79) и GeForce Experience (для управления сохранением кадров).
+4. Перед использованием в Nvidia overlay отключить «In-Game Overlay» — иначе Ansel не запускается из движка (см. upstream README, шаги (2)–(5)).
+5. В сцене отключить auto-exposure, использовать 16:9 viewport (1920x1080 / 2560x1440 / 3840x2160), запустить Ansel hotkey'ем — управлять камерой / фильтрами / capture через встроенный Ansel UI.
+
+Детальный setup-guide со скриншотами — в upstream README.
+
+## TODO
+
+- Carry-over from upstream: см. [issues MonsterGuo/UE5_NvidiaAnsel](https://github.com/MonsterGuo/UE5_NvidiaAnsel/issues).
+- NextGenium-specific: TBD — добавится по мере использования.
+
+## Limitations
+
+- `PlatformAllowList: ["Win64"]` в `.uplugin` — для других платформ нужна явная правка (Ansel SDK сам по себе Win-only).
+- Работает только с Nvidia GeForce / RTX GPU — на AMD/Intel плагин не активируется.
+- Требует GeForce Experience для управления save-path; без него screenshots идут в системную папку «Видео».
+- Upstream README на китайском; setup steps требуют перевода для русскоязычной команды.
+
+## Origin
+
+Upstream — **`MonsterGuo/UE5_NvidiaAnsel`** (https://github.com/MonsterGuo/UE5_NvidiaAnsel), license не объявлена, портация оригинального Epic Games `Ansel` плагина с UE4.27 на UE5 автором **MonsterGuo**. В `.uplugin` `CreatedBy: "Epic Games, Inc."` (унаследовано от оригинала).
+
+NextGenium-форк используется как-есть (branch `UE5.6`) — см. секцию «NextGenium-доработки».
+
+## Maintainers
+
+- [Pavel Penkov (`Ciberusps`)](https://github.com/Ciberusps) — контрибьютор NextGenium-форка.
+
+Upstream-автор **MonsterGuo** (24 коммита наследия из upstream) указан в секции «Origin» — мейнтейнером форка не является.
+
+## References
+
+- **Upstream repo:** https://github.com/MonsterGuo/UE5_NvidiaAnsel
+- **Nvidia Ansel SDK:** https://developer.nvidia.com/rtx/ansel
+- **Epic Games Ansel plugin (original):** в UE source — `Engine/Plugins/Runtime/Nvidia/Ansel`.
