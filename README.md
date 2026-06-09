@@ -82,7 +82,9 @@ NextGenium-форк используется как-есть (branch `UE5.6`) �
 
 ## Maintainers
 
-TBD. На момент написания не зафиксирован — открытый вопрос к Диме.
+- [Pavel Penkov (`Ciberusps`)](https://github.com/Ciberusps) — контрибьютор NextGenium-форка.
+
+Upstream-автор **MonsterGuo** (24 коммита наследия из upstream) указан в секции «Origin» — мейнтейнером форка не является.
 
 ## References
 
